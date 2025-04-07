@@ -34,31 +34,6 @@ A evolução do projeto prevê a implementação das seguintes funcionalidades:
 9.  **Gerenciamento de Ordens de Serviço:** Uma funcionalidade para criar, acompanhar e gerenciar as ordens de serviço de manutenção.
 10. **Utilização de AJAX:** Considerar o uso de AJAX para tornar as interações mais dinâmicas e melhorar a experiência do usuário, evitando recarregamentos de página.
 
-## Diagrama Conceitual
-
-```mermaid
-graph LR
-    A[Usuário (Admin/Técnico)] --> B(Página Principal);
-    B --> C{Cadastro};
-    C -- Cliente --> D(Formulário Cadastro Cliente);
-    C -- Técnico --> E(Formulário Cadastro Técnico);
-    E -- Código Secreto --> F{Validação Código Técnico};
-    F -- Válido --> G(Registro Técnico);
-    F -- Inválido --> E;
-    B --> H{Listagem (Futuro)};
-    H -- Clientes/Aparelhos --> I(Página Listagem Clientes/Aparelhos);
-    H -- Técnicos --> J(Página Listagem Técnicos);
-    B --> K(Gerar Códigos Técnicos);
-    K --> L(Formulário Gerar Códigos);
-    L --> M(Processar Geração Códigos PHP);
-    M --> N(Banco de Dados);
-    M -- Sucesso --> O(Exibir Códigos);
-    O --> P(Botão Exportar .txt);
-    N -- Armazena --> F;
-    N -- Armazena --> G;
-    N -- Armazena --> I;
-    N -- Armazena --> J;
-
 
  ## Estrutura do Projeto (Arquivos Principais)
 .
