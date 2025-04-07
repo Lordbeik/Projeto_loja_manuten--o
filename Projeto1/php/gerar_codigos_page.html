@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Códigos de Técnico</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+
+        #exportarCodigosBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: none; /* Oculto inicialmente */
+        }
+
+        #exportarCodigosBtn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Gerar Códigos de Técnico</h2>
+        <form id="gerarCodigosForm" action="processar_gerar_codigos.php" method="post">
+            <div class="mb-3">
+                <label for="quantidade_codigos" class="form-label">Quantidade de Códigos a Gerar:</label>
+                <input type="number" class="form-control" id="quantidade_codigos" name="quantidade_codigos" value="5" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Gerar Códigos</button>
+        </form>
+
+        <div id="resultado" class="mt-3" style="display: none;"></div>
+        <button id="exportarCodigosBtn">Exportar Códigos para .txt</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        const gerarCodigosForm = document.getElementById('gerarCodigosForm');
+        const resultadoDiv = document.getElementById('resultado');
+        const exportarCodigosBtn = document.getElementById('exportarCodigosBtn');
+        let codigosGerados = [];
+
+        gerarCodigosForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('processar_gerar_codigos.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json()) // Espera uma resposta JSON
+            .then(data => {
+                if (data.success && data.codigos) {
+                    resultadoDiv.innerHTML = '<div class="alert alert-success" role="alert">Códigos gerados com sucesso!</div><pre>' + data.codigos.join('\n') + '</pre>';
+                    resultadoDiv.style.display = 'block';
+                    codigosGerados = data.codigos; // Armazena os códigos
+                    exportarCodigosBtn.style.display = 'block'; // Mostra o botão de exportação
+                } else if (data.error) {
+                    resultadoDiv.innerHTML = `<div class="alert alert-danger" role="alert">Erro ao gerar os códigos: ${data.error}</div>`;
+                    resultadoDiv.style.display = 'block';
+                    exportarCodigosBtn.style.display = 'none';
+                } else {
+                    resultadoDiv.innerHTML = '<div class="alert alert-danger" role="alert">Erro desconhecido ao gerar os códigos.</div>';
+                    resultadoDiv.style.display = 'block';
+                    exportarCodigosBtn.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                resultadoDiv.innerHTML = '<div class="alert alert-danger" role="alert">Ocorreu um erro ao enviar os dados: ' + error + '</div>';
+                resultadoDiv.style.display = 'block';
+                exportarCodigosBtn.style.display = 'none';
+            });
+        });
+
+        exportarCodigosBtn.addEventListener('click', function() {
+            if (codigosGerados.length > 0) {
+                const textoParaExportar = codigosGerados.join('\n');
+                const nomeArquivo = 'codigos_tecnicos.txt';
+                const elementoLink = document.createElement('a');
+                elementoLink.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textoParaExportar));
+                elementoLink.setAttribute('download', nomeArquivo);
+                elementoLink.style.display = 'none';
+                document.body.appendChild(elementoLink);
+                elementoLink.click();
+                document.body.removeChild(elementoLink);
+            } else {
+                alert('Nenhum código foi gerado para exportar.');
+            }
+        });
+    </script>
+</body>
+</html>
